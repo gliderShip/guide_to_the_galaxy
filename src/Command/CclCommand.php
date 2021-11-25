@@ -2,10 +2,7 @@
 
 namespace App\Command;
 
-use App\Model\AssociationStrategy;
-use App\Model\Coordinate;
-use App\Service\CoordinateManagerInterface;
-use App\Service\FourConnectivity;
+use App\Service\CclManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -25,18 +22,16 @@ class CclCommand extends Command
         [0, 0, 0, 1, 1],
     ];
 
-    private AssociationStrategy $associationStrategy;
+
     private ?int $totalRows = null;
     private ?int $totalColumns = null;
     private int $groups = 0;
-    private CoordinateManagerInterface $coordinateManager;
+    private CclManager $cclManager;
 
-    public function __construct(FourConnectivity $associationStrategy, CoordinateManagerInterface $coordinateManager)
+    public function __construct(CclManager $cclManager)
     {
-        $this->associationStrategy = $associationStrategy;
-        $this->coordinateManager = $coordinateManager;
-
         parent::__construct();
+        $this->cclManager = $cclManager;
     }
 
     protected function configure(): void
@@ -48,20 +43,18 @@ class CclCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
+        $io->text(sprintf('Matrix %d x %d', $this->totalRows, $this->totalColumns));
         $io->table([], self::$matrix);
 
         $this->totalRows = count(self::$matrix);
         $this->totalColumns = count(max(self::$matrix));
 
-        $io->text(sprintf('Matrix %d x %d', $this->totalRows, $this->totalColumns));
-
+        $this->groups = $this->cclManager->getGroups(self::$matrix, $io);
 
 
         $io->success(sprintf('Found %d groups', $this->groups));
         return 0;
     }
-
-
 
 
 }

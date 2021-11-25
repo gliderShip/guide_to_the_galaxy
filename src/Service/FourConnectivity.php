@@ -7,6 +7,9 @@ use App\Model\Coordinate;
 
 class FourConnectivity implements AssociationStrategy
 {
+    /**
+     * @return array|Coordinate[]
+     */
     public function getConnectedCellCoordinates(CoordinateManager $coordinateManager, Coordinate $position, int $totalRows, int $totalColumns): array
     {
         $neighbourCoordinates = [];

@@ -2,7 +2,9 @@
 
 namespace App\Command;
 
+use App\Service\CclManager;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -15,20 +17,26 @@ class IterativeCclCommand extends Command
     protected static string $defaultDescription = 'Add a short description for your command';
     private int $widestColumnSize = 0;
 
-    private array $matrix = [];
+    private CclManager $cclManager;
+
+    public function __construct(CclManager $cclManager)
+    {
+        parent::__construct();
+        $this->cclManager = $cclManager;
+    }
 
     protected function configure(): void
     {
-        $this
-            ->setDescription(self::$defaultDescription);
+        $this->setDescription(self::$defaultDescription);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $helper = $this->getHelper('question');
         $question = 'Please input the matrix first row (use space to separate values). Press enter when done!';
         $question .= PHP_EOL . "Rows will be automatically padded with " . self::MATRIX_NULL_VALUE . "'s if needed";
+
+        $matrix = [];
 
         while (true) {
             $answer = $io->ask($question);
@@ -38,32 +46,33 @@ class IterativeCclCommand extends Command
             }
 
             $row = explode(' ', $answer);
-            $isError = $this->isInvalid($row);
+            $error = $this->isInvalid($row);
 
-            if ($isError !== false) {
-                $io->error("Invalid input at index $isError ->:" . $row[$isError]);
+            if ($error !== false) {
+                $io->error("Invalid input at index $error ->:" . $row[$error]);
                 continue;
             }
 
-            $this->matrix[] = $row;
+            $matrix[] = $row;
             $this->widestColumnSize = max($this->widestColumnSize, count($row));
         }
 
-        if (count($this->matrix) == 0) {
+        if (count($matrix) == 0) {
             $io->warning('No input found!');
             return 0;
         }
 
-        $this->widestColumnSize = $this->getWidestColumnSize($this->matrix);
-        foreach ($this->matrix as &$row) {
+        $this->widestColumnSize = $this->getWidestColumnSize($matrix);
+        foreach ($matrix as &$row) {
             $row = array_pad($row, $this->widestColumnSize, self::MATRIX_NULL_VALUE);
         }
 
         // print matrix as table
         $io->note('Matrix:');
-        $io->table([], $this->matrix);
+        $io->table([new TableCell("Matrix", ['colspan' => $this->widestColumnSize])], $matrix);
 
-        $this->iterativeCcl($this->matrix);
+        $groups = $this->cclManager->getGroups($matrix, $io);
+        $io->success(sprintf('Found %d groups', $groups));
         $io->success('Bye!');
 
         return 0;
