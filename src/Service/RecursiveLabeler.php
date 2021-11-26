@@ -33,14 +33,11 @@ class RecursiveLabeler extends Labeler implements ConnectedComponentLabeler
     }
 
     /**
-     * Warning! This function has side effects. The matrix array parameter will be destroyed.
-     * Please make a copy of the original matrix array if you need to keep it.
+     * Warning! This function has side effects. The matrix will be destroyed.
+     * Please make a copy of the original matrix if you need to keep it.
      */
     private function flood(Matrix &$matrix, Coordinate $position)
     {
-        $row = $position->getRow();
-        $column = $position->getColumn();
-
         if (Matrix::isBackgroundElement($matrix->getElement($position))) {
             return;
         }

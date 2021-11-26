@@ -40,6 +40,10 @@ class StackLabeler extends Labeler implements ConnectedComponentLabeler
         return $groups;
     }
 
+    /**
+     * Warning! This function has side effects. The matrix will be destroyed.
+     * Please make a copy of the original matrix if you need to keep it.
+     */
     private function flood(array &$stack, Matrix &$matrix)
     {
         while ($coordinate = array_pop($stack)) {
