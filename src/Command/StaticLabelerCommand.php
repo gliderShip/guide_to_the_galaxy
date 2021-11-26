@@ -2,18 +2,21 @@
 
 namespace App\Command;
 
-use App\Service\CclManager;
+use App\Model\Matrix;
+use App\Service\ConnectedComponentLabeler;
+use App\Service\RecursiveLabeler;
+use App\Service\StackLabeler;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class CclCommand extends Command
+class StaticLabelerCommand extends Command
 {
-    protected static $defaultName = 'app:ccl';
+    protected static $defaultName = 'app:static-labeler';
     protected static string $defaultDescription = 'Connected-component labeling';
 
-    private static array $matrix = [
+    private static array $elements = [
         [1, 1, 0, 0, 0],
         [0, 1, 0, 0, 1],
         [1, 0, 0, 1, 1],
@@ -23,15 +26,12 @@ class CclCommand extends Command
     ];
 
 
-    private ?int $totalRows = null;
-    private ?int $totalColumns = null;
-    private int $groups = 0;
-    private CclManager $cclManager;
+    private ConnectedComponentLabeler $labeler;
 
-    public function __construct(CclManager $cclManager)
+    public function __construct(RecursiveLabeler $labeler)
     {
         parent::__construct();
-        $this->cclManager = $cclManager;
+        $this->labeler = $labeler;
     }
 
     protected function configure(): void
@@ -43,16 +43,16 @@ class CclCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $io->text(sprintf('Matrix %d x %d', $this->totalRows, $this->totalColumns));
-        $io->table([], self::$matrix);
-
-        $this->totalRows = count(self::$matrix);
-        $this->totalColumns = count(max(self::$matrix));
-
-        $this->groups = $this->cclManager->getGroups(self::$matrix, $io);
+        $matrix = new Matrix(self::$elements);
 
 
-        $io->success(sprintf('Found %d groups', $this->groups));
+        $io->text(sprintf('Matrix %d rows x %d columns', $matrix->getTotalRows(), $matrix->getTotalColumns()));
+        $io->table([], self::$elements);
+
+        $groups = $this->labeler->getGroupsNr($matrix, $io);
+
+
+        $io->success(sprintf('Found %d groups', $groups));
         return 0;
     }
 

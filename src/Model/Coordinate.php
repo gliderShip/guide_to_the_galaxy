@@ -9,30 +9,26 @@ class Coordinate
     /**
      * @Assert\PositiveOrZero()
      */
-    private int $x;
+    private int $row;
 
     /**
      * @Assert\PositiveOrZero()
      */
-    private int $y;
+    private int $column;
 
-    public function __construct(int $x, int $y)
+    public function __construct(int $row, int $column)
     {
-        $this->x = $x;
-        $this->y = $y;
+        $this->row = $row;
+        $this->column = $column;
     }
 
-    public function getX(): int
+    public function getRow(): int
     {
-        return $this->x;
+        return $this->row;
     }
 
-    public function getY(): int
+    public function getColumn(): int
     {
-        return $this->y;
+        return $this->column;
     }
-
-
-
-
 }

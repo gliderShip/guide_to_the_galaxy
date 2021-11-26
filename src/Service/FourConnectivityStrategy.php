@@ -5,22 +5,23 @@ namespace App\Service;
 use App\Model\AssociationStrategy;
 use App\Model\Coordinate;
 
-class FourConnectivity implements AssociationStrategy
+class FourConnectivityStrategy implements AssociationStrategy
 {
     /**
      * @return array|Coordinate[]
      */
-    public function getConnectedCellCoordinates(CoordinateManager $coordinateManager, Coordinate $position, int $totalRows, int $totalColumns): array
+    public function getAssociatedCellCoordinates(CoordinateManager $coordinateManager, Coordinate $position, int $totalRows, int $totalColumns): array
     {
         $neighbourCoordinates = [];
 
         $top = $coordinateManager->getTop($position);
-        $top ? $neighbourCoordinates[] = $top : null;
         $left = $coordinateManager->getLeft($position);
-        $left ? $neighbourCoordinates[] = $left : null;
         $right = $coordinateManager->getRight($position, $totalColumns);
-        $right ? $neighbourCoordinates[] = $right : null;
         $bottom = $coordinateManager->getBottom($position, $totalRows);
+
+        $top ? $neighbourCoordinates[] = $top : null;
+        $left ? $neighbourCoordinates[] = $left : null;
+        $right ? $neighbourCoordinates[] = $right : null;
         $bottom ? $neighbourCoordinates[] = $bottom : null;
 
         return $neighbourCoordinates;

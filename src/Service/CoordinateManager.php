@@ -6,18 +6,33 @@ use App\Model\Coordinate;
 
 class CoordinateManager implements CoordinateManagerInterface
 {
+    public function isFirstRow(Coordinate $coordinate): bool
+    {
+        return $coordinate->getRow() === 0;
+    }
+
+    public function isFirstColumn(Coordinate $coordinate): bool
+    {
+        return $coordinate->getColumn() === 0;
+    }
+
+    public function isLastRow(Coordinate $coordinate, int $totalRows): bool
+    {
+        return $coordinate->getRow() === $totalRows - 1;
+    }
+
+    public function isLastColumn(Coordinate $coordinate, int $totalColumns): bool
+    {
+        return $coordinate->getColumn() === $totalColumns - 1;
+    }
+
     public function getTop(Coordinate $coordinate): ?Coordinate
     {
         if ($this->isFirstRow($coordinate)) {
             return null;
         }
 
-        return new Coordinate($coordinate->getX(), $coordinate->getY() - 1);
-    }
-
-    public function isFirstRow(Coordinate $coordinate): bool
-    {
-        return $coordinate->getY() === 0;
+        return new Coordinate($coordinate->getRow() - 1, $coordinate->getColumn());
     }
 
     public function getLeft(Coordinate $coordinate): ?Coordinate
@@ -26,12 +41,7 @@ class CoordinateManager implements CoordinateManagerInterface
             return null;
         }
 
-        return new Coordinate($coordinate->getX() - 1, $coordinate->getY());
-    }
-
-    public function isFirstColumn(Coordinate $coordinate): bool
-    {
-        return $coordinate->getY() === 0;
+        return new Coordinate($coordinate->getRow(), $coordinate->getColumn() - 1);
     }
 
     public function getRight(Coordinate $coordinate, int $totalColumns): ?Coordinate
@@ -40,12 +50,7 @@ class CoordinateManager implements CoordinateManagerInterface
             return null;
         }
 
-        return new Coordinate($coordinate->getX() + 1, $coordinate->getY());
-    }
-
-    public function isLastColumn(Coordinate $coordinate, int $totalColumns): bool
-    {
-        return $coordinate->getX() === $totalColumns - 1;
+        return new Coordinate($coordinate->getRow(), $coordinate->getColumn() + 1);
     }
 
     public function getBottom(Coordinate $coordinate, int $totalRows): ?Coordinate
@@ -54,12 +59,7 @@ class CoordinateManager implements CoordinateManagerInterface
             return null;
         }
 
-        return new Coordinate($coordinate->getX(), $coordinate->getY() + 1);
-    }
-
-    public function isLastRow(Coordinate $coordinate, int $totalRows): bool
-    {
-        return $coordinate->getY() === $totalRows - 1;
+        return new Coordinate($coordinate->getRow() + 1, $coordinate->getColumn());
     }
 
     public function getTopLeft(Coordinate $coordinate): ?Coordinate
@@ -68,7 +68,7 @@ class CoordinateManager implements CoordinateManagerInterface
             return null;
         }
 
-        return new Coordinate($coordinate->getX() - 1, $coordinate->getY() - 1);
+        return new Coordinate($coordinate->getRow() - 1, $coordinate->getColumn() - 1);
     }
 
     public function getTopRight(Coordinate $coordinate, int $totalColumns): ?Coordinate
@@ -77,7 +77,7 @@ class CoordinateManager implements CoordinateManagerInterface
             return null;
         }
 
-        return new Coordinate($coordinate->getX() + 1, $coordinate->getY() - 1);
+        return new Coordinate($coordinate->getRow() - 1, $coordinate->getColumn() + 1);
     }
 
     public function getBottomLeft(Coordinate $coordinate, int $totalRows): ?Coordinate
@@ -86,7 +86,7 @@ class CoordinateManager implements CoordinateManagerInterface
             return null;
         }
 
-        return new Coordinate($coordinate->getX() - 1, $coordinate->getY() + 1);
+        return new Coordinate($coordinate->getRow() + 1, $coordinate->getColumn() - 1);
     }
 
     public function getBottomRight(Coordinate $coordinate, int $totalRows, int $totalColumns): ?Coordinate
@@ -95,7 +95,8 @@ class CoordinateManager implements CoordinateManagerInterface
             return null;
         }
 
-        return new Coordinate($coordinate->getX() + 1, $coordinate->getY() + 1);
+        return new Coordinate($coordinate->getRow() + 1, $coordinate->getColumn() + 1);
     }
 
 }
+
